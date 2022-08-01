@@ -1,8 +1,8 @@
 import styles from '../styles/Result.module.css'
-import btnStyles from '../styles/Button.module.css'
 import { useRouter } from "next/router";
 import Stats from '../components/Stats';
 import Button from '../components/Button';
+import useSound from 'use-sound';
 
 export default function Result() {
   const router = useRouter();
@@ -10,8 +10,10 @@ export default function Result() {
   const total = +router.query.total!;
   const correct = +router.query.correct!;
   const percentual = Math.round((correct / total) * 100);
+  const [playSwipe] = useSound('/sounds/swipe.mp3', { volume: 0.5 });
 
   function restartQuiz() {
+    playSwipe();
     router.push({
       pathname: '/',
     });
@@ -25,7 +27,7 @@ export default function Result() {
         <Stats text='Acertou' value={correct} bgColor="#9CD2A4" />
         <Stats text='Percentual' value={`${percentual}%`} bgColor="#DE6A33" />
       </div>
-      <Button href='/' text='Recomeçar jogo'></Button>
+      <Button onClick={() => restartQuiz()} text='Recomeçar jogo'></Button>
     </div>
   );
 }

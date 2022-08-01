@@ -1,10 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Button from '../components/Button';
-import Question from '../components/Question'
 import Quiz from '../components/Quiz';
-import AnswerModel from '../models/answer'
 import QuestionModel from '../models/question'
+import useSound from 'use-sound';
 
 const BASE_URL = '/api';
 
@@ -14,6 +12,10 @@ export default function Home() {
   const [questionIds, setQuestionIds] = useState<number[]>([]);
   const [question, setQuestion] = useState<QuestionModel>();
   const [correctAnswers, setCorrectAnswers] = useState<number>(0);
+  const [playCorrectAnswer] = useSound('/sounds/correct.mp3', { volume: 0.5 });
+  const [playWrongAnswer] = useSound('/sounds/wrong.mp3', { volume: 0.5 });
+  const [playSwipe] = useSound('/sounds/swipe.mp3', { volume: 0.5 });
+  const [playCompleteGame] = useSound('/sounds/complete.mp3', { volume: 0.5 });
 
 
   async function loadQuestionIds() {
@@ -44,6 +46,7 @@ export default function Home() {
     setQuestion(question);
     const correct = question.correctAnswer;
     setCorrectAnswers(correctAnswers + (correct ? 1 : 0));
+    correct ? playCorrectAnswer() : playWrongAnswer();
   }
 
   function nextQuestionId() {
@@ -60,9 +63,11 @@ export default function Home() {
 
   function nextQuestion(nextId: number) {
     loadQuestion(nextId);
+    playSwipe();
   }
 
   function endQuiz() {
+    playCompleteGame();
     router.push({
       pathname: '/result',
       query: {
